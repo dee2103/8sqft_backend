@@ -107,14 +107,14 @@ export const createAgreement = async (req, res) => {
 
 export const getAgreements = async (req, res) => {
   try {
-    const searchPhone = req.query.searchPhone || ""; 
-    const searchDate = req.query.searchDate || "";
-    const searchType = req.query.searchType || ""; 
-    const page = parseInt(req.query.page) || 1;
-    const limit = 10; 
-    const offset = (page - 1) * limit;
+      const searchPhone = req.query.searchPhone || ""; 
+      const searchDate  = req.query.searchDate || "";
+      const searchType  = req.query.searchType || ""; 
+      const page        = parseInt(req.query.page) || 1;
+      const limit       = 10; 
+      const offset      = (page - 1) * limit;
 
-    let searchQuery = "WHERE 1=1"; 
+    let searchQuery = "WHERE 1 = 1"; 
 
     if (searchPhone) {
       searchQuery += ` AND delivery_address_phone LIKE '%${searchPhone}%'`;
@@ -138,7 +138,7 @@ export const getAgreements = async (req, res) => {
 
     const totalPages = Math.ceil(totalCount / limit);
     const startIndex = offset + 1;
-    const endIndex = Math.min(offset + limit, totalCount);
+    const endIndex   = Math.min(offset + limit, totalCount);
 
     res.render("agreements", {
       agreements,
@@ -160,7 +160,7 @@ export const getAgreements = async (req, res) => {
 export const getAgreementDetails = async (req, res) => {
     const { id } = req.params;
     try {
-      const query = "SELECT * FROM rent_agriment_enquiry WHERE id = ?";
+      const query  = "SELECT * FROM rent_agriment_enquiry WHERE id = ?";
       const [rows] = await db.query(query, [id]);
       if (rows.length === 0) {
         return res.status(404).send("Agreement not found");
