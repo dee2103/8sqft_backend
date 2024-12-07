@@ -107,6 +107,7 @@ export const createAgreement = async (req, res) => {
 
 export const getAgreements = async (req, res) => {
   try {
+    
       const searchPhone = req.query.searchPhone || ""; 
       const searchDate  = req.query.searchDate || "";
       const searchType  = req.query.searchType || ""; 
