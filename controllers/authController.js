@@ -1,4 +1,4 @@
-import twilio  from "twilio";
+import twilio  from 'twilio';
 import nodemailer  from "nodemailer";
 import jwt  from "jsonwebtoken";
 
@@ -6,9 +6,13 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+
+
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const whatsappNumber = process.env.TWILIO_WHATSAPP_NUMBER;
+
+const client = twilio(accountSid, authToken);
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -20,13 +24,11 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-const client = twilio(accountSid, authToken);
 
 const otpStore = {}; 
 
 
 const generateOtp = () => Math.floor(100000 + Math.random() * 900000);
-
 
 export const sendOtpToMobile = async (req, res) => {
   const { mobile } = req.body;
@@ -35,22 +37,49 @@ export const sendOtpToMobile = async (req, res) => {
     return res.status(400).json({ message: "Mobile number is required" });
   }
 
-  const otp = generateOtp();
-  otpStore[mobile] = otp;
+  const formatPhoneNumber = (number) => {
+    // Convert input to string and remove any non-numeric characters
+    const cleanedNumber = String(number).replace(/\D/g, '');
+    if (!cleanedNumber.startsWith('91') && cleanedNumber.length === 10) {
+      return `+91${cleanedNumber}`;
+    }
+    return `+${cleanedNumber}`;
+  };
 
   try {
-    await client.messages.create({
+    const formattedMobile = formatPhoneNumber(mobile);
+    console.log("Formatted Mobile:", formattedMobile);
+
+    const otp = generateOtp();
+    otpStore[formattedMobile] = otp;
+    console.log("Generated OTP:", otp);
+
+    const message = await client.messages.create({
       from: whatsappNumber,
-      to: `whatsapp:${mobile}`,
+      to: `whatsapp:${formattedMobile}`,
       body: `Your login OTP is: ${otp}`,
     });
 
-    res.status(200).json({ message: "OTP sent to WhatsApp" });
+    console.log("Message sent with SID:", message.sid);
+
+    const fetchedMessage = await client.messages(message.sid).fetch();
+    console.log("Message Status:", fetchedMessage.status);
+    console.log("Error Code:", fetchedMessage.errorCode);
+    console.log("Error Message:", fetchedMessage.errorMessage);
+
+    res.status(200).json({
+      message: "OTP sent to WhatsApp",
+      sid: message.sid,
+      status: fetchedMessage.status,
+      errorCode: fetchedMessage.errorCode,
+      errorMessage: fetchedMessage.errorMessage,
+    });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Failed to send OTP" });
+    console.error("Error while sending OTP:", error);
+    res.status(500).json({ message: "Failed to send OTP", error: error.message });
   }
 };
+
 
 
 export const verifyMobileOtp = (req, res) => {
