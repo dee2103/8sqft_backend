@@ -1,6 +1,8 @@
 
 import express from "express";
-import { sendOtpToMobile, verifyMobileOtp, sendOtpToEmail, verifyEmailOtp } from "../controllers/authController";
+import { sendOtpToMobile, verifyMobileOtp, sendOtpToEmail, verifyEmailOtp } from "../controllers/authController.js";
+
+
 
 const router = express.Router();
 

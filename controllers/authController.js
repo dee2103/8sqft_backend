@@ -28,7 +28,7 @@ const otpStore = {};
 const generateOtp = () => Math.floor(100000 + Math.random() * 900000);
 
 
-exports.sendOtpToMobile = async (req, res) => {
+export const sendOtpToMobile = async (req, res) => {
   const { mobile } = req.body;
 
   if (!mobile) {
@@ -53,7 +53,7 @@ exports.sendOtpToMobile = async (req, res) => {
 };
 
 
-exports.verifyMobileOtp = (req, res) => {
+export const verifyMobileOtp = (req, res) => {
   const { mobile, otp } = req.body;
 
   if (otpStore[mobile] === parseInt(otp, 10)) {
@@ -66,7 +66,7 @@ exports.verifyMobileOtp = (req, res) => {
 };
 
 
-exports.sendOtpToEmail = async (req, res) => {
+export const sendOtpToEmail = async (req, res) => {
   const { email } = req.body;
 
   if (!email) {
@@ -92,7 +92,7 @@ exports.sendOtpToEmail = async (req, res) => {
 };
 
 
-exports.verifyEmailOtp = (req, res) => {
+export const verifyEmailOtp = (req, res) => {
   const { email, otp } = req.body;
 
   if (otpStore[email] === parseInt(otp, 10)) {
