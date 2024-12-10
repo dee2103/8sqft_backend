@@ -38,7 +38,6 @@ export const sendOtpToMobile = async (req, res) => {
   }
 
   const formatPhoneNumber = (number) => {
-    // Convert input to string and remove any non-numeric characters
     const cleanedNumber = String(number).replace(/\D/g, '');
     if (!cleanedNumber.startsWith('91') && cleanedNumber.length === 10) {
       return `+91${cleanedNumber}`;
@@ -62,25 +61,26 @@ export const sendOtpToMobile = async (req, res) => {
 
     console.log("Message sent with SID:", message.sid);
 
-    const fetchedMessage = await client.messages(message.sid).fetch();
-    console.log("Message Status:", fetchedMessage.status);
-    console.log("Error Code:", fetchedMessage.errorCode);
-    console.log("Error Message:", fetchedMessage.errorMessage);
-
     res.status(200).json({
       message: "OTP sent to WhatsApp",
       sid: message.sid,
-      status: fetchedMessage.status,
-      errorCode: fetchedMessage.errorCode,
-      errorMessage: fetchedMessage.errorMessage,
+      status: message.status,
     });
   } catch (error) {
     console.error("Error while sending OTP:", error);
-    res.status(500).json({ message: "Failed to send OTP", error: error.message });
+    if (error.code === 63015) {
+      res.status(400).json({
+        message: "Failed to send OTP. Ensure the number is WhatsApp-enabled.",
+        error: error.message,
+      });
+    } else {
+      res.status(500).json({
+        message: "Failed to send OTP due to an internal error.",
+        error: error.message,
+      });
+    }
   }
 };
-
-
 
 export const verifyMobileOtp = (req, res) => {
   const { mobile, otp } = req.body;
@@ -93,7 +93,6 @@ export const verifyMobileOtp = (req, res) => {
     res.status(400).json({ message: "Invalid OTP" });
   }
 };
-
 
 export const sendOtpToEmail = async (req, res) => {
   const { email } = req.body;
@@ -119,7 +118,6 @@ export const sendOtpToEmail = async (req, res) => {
     res.status(500).json({ message: "Failed to send OTP" });
   }
 };
-
 
 export const verifyEmailOtp = (req, res) => {
   const { email, otp } = req.body;
