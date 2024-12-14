@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import agreementRoutes from "./routes/agreementRoutes.js";
 import viewRoutes from "./routes/viewRoutes.js";
+import cors from "cors";
 
 import authRoutes from "./routes/authRoutes.js";
 
@@ -18,6 +19,8 @@ app.use(express.static("public"));
 
 
 app.use(express.json());
+
+app.use(cors());
 
 
 app.use("/api/v1/", agreementRoutes);

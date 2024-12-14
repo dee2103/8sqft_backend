@@ -191,8 +191,7 @@ export const registerUser = async (req, res) => {
 
     const insertQuery = `
       INSERT INTO tbl_users (email, first_name, last_name, mobile)
-      VALUES (?, ?, ?, ?)
-    `;
+      VALUES (?, ?, ?, ?)`;
     await db.query(insertQuery, [email, first_name, last_name, mobile]);
 
     const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '1h' });
